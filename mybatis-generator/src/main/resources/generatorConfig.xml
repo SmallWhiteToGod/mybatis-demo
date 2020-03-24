@@ -23,7 +23,7 @@
         </javaTypeResolver>
 
         <!-- targetProject:生成POJO类的位置 -->
-        <javaModelGenerator targetPackage="com.example.pojo" targetProject="D:/workSpace/mybatis-demo/mybatis-generator/src/main/java">
+        <javaModelGenerator targetPackage="com.example.pojo" targetProject="D:/github/mybatis-demo/mybatis-generator/src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
             <!-- 从数据库返回的值被清理前后的空格 -->
@@ -35,13 +35,13 @@
         </javaModelGenerator>
 
         <!-- targetProject:mapper映射文件生成的位置 -->
-        <sqlMapGenerator targetPackage="com.example.mapper" targetProject="D:/workSpace/mybatis-demo/mybatis-generator/src/main/java">
+        <sqlMapGenerator targetPackage="com.example.mapper" targetProject="D:/github/mybatis-demo/mybatis-generator/src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
         </sqlMapGenerator>
 
         <!-- targetPackage：mapper接口生成的位置 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.example.dao" targetProject="D:/workSpace/mybatis-demo/mybatis-generator/src/main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.example.dao" targetProject="D:/github/mybatis-demo/mybatis-generator/src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
