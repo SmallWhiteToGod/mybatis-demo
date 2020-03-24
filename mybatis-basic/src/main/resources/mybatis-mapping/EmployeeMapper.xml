@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.dao.EmployeeDao">
+
+    <!--开启二级缓存
+    eviction策略默认LRU  flushInterval 清空时间 默认不清空
+    readOnly是否只读 true只读返回相同的对象 false会通过序列化clone一个
+    size 缓存中元素个数 type 自定义的缓存 需要实现Cache接口
+    blocking 默认false
+    设置为true时候 查询缓存时锁住对应的 Key，如果缓存命中了则会释放对应的锁，
+    否则会在查询数据库以后再释放锁，这样可以阻止并发情况下多个线程同时查询数据。
+    -->
+    <cache eviction="FIFO" flushInterval="60000" readOnly="true" size="1024" blocking="false"/>
+
+    <resultMap id="BaseResultMap" type="com.example.pojo.Employee">
+        <id column="ID" property="id" jdbcType="INTEGER"/>
+        <result column="LAST_NAME" property="lastName" jdbcType="VARCHAR"/>
+        <result column="GENDER" property="gender" jdbcType="VARCHAR"/>
+        <result column="EMAIL" property="email" jdbcType="VARCHAR"/>
+        <result column="VERSION" property="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--sql 把可复用的部分提取出来,相当于这个文件中的数据字典,通过include标签引用-->
+    <sql id="employee_TABLE_FIELD">ID,LAST_NAME,GENDER,EMAIL,VERSION</sql>
+    <sql id="employee_TABLE_INSERT_FIELD">LAST_NAME,GENDER,EMAIL,VERSION</sql>
+
+    <select id="selectById" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="employee_TABLE_FIELD"/>
+        from employee
+        where
+        ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="employee_TABLE_FIELD"/>
+        from employee
+        where 1=1
+        <if test="id != null and id != ''  ">
+            and ID = #{id,jdbcType=INTEGER }
+        </if>
+        <if test="lastName != null and lastName != ''  ">
+            and LAST_NAME = #{lastName,jdbcType=VARCHAR }
+        </if>
+        <if test="gender != null and gender != ''  ">
+            and GENDER = #{gender,jdbcType=VARCHAR }
+        </if>
+        <if test="email != null and email != ''  ">
+            and EMAIL = #{email,jdbcType=VARCHAR }
+        </if>
+        <if test="version != null and version != '' ">
+            and VERSION = #{version,jdbcType=INTEGER }
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.example.pojo.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into employee (
+        <include refid="employee_TABLE_INSERT_FIELD"/>
+        )
+        values (
+        #{lastName,jdbcType=VARCHAR } ,
+        #{gender,jdbcType=VARCHAR } ,
+        #{email,jdbcType=VARCHAR } ,
+        #{version,jdbcType=INTEGER }
+        )
+    </insert>
+
+    <delete id="delete" parameterType="map">
+		delete from employee
+		where
+			ID = #{id, jdbcType=INTEGER}
+	</delete>
+
+    <update id="updateNotNull" parameterType="com.example.pojo.Employee">
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lastName != null ">
+                LAST_NAME = #{lastName,jdbcType=VARCHAR },
+            </if>
+            <if test="gender != null ">
+                GENDER = #{gender,jdbcType=VARCHAR },
+            </if>
+            <if test="email != null ">
+                EMAIL = #{email,jdbcType=VARCHAR },
+            </if>
+            <if test="version != null ">
+                VERSION = #{version,jdbcType=INTEGER }
+            </if>
+        </trim>
+        where
+        ID = #{id, jdbcType=INTEGER}
+    </update>
+
+    <update id="update" parameterType="com.example.pojo.Employee">
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            LAST_NAME = #{lastName,jdbcType=VARCHAR },
+            GENDER = #{gender,jdbcType=VARCHAR },
+            EMAIL = #{email,jdbcType=VARCHAR },
+            VERSION = VERSION + 1
+        </trim>
+        where
+        ID = #{id, jdbcType=INTEGER}
+    </update>
+
+    <update id="updateNotNullByVersion" parameterType="com.example.pojo.Employee">
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lastName != null ">
+                LAST_NAME = #{lastName,jdbcType=VARCHAR },
+            </if>
+            <if test="gender != null ">
+                GENDER = #{gender,jdbcType=VARCHAR },
+            </if>
+            <if test="email != null ">
+                EMAIL = #{email,jdbcType=VARCHAR },
+            </if>
+            <if test="version != null ">
+                VERSION = #{version,jdbcType=INTEGER } + 1
+            </if>
+        </trim>
+        where
+        ID = #{id, jdbcType=INTEGER}
+        <if test="version != null and version != '' ">
+            and VERSION = #{version,jdbcType=INTEGER }
+        </if>
+    </update>
+
+    <!--调用存储过程示例 seclect标签 statementType="CALLABLE"-->
+    <!--	<select id="getPageByProcedure" statementType="CALLABLE">-->
+    <!--		{call getPageProcedure(-->
+    <!--			#{start, mode=IN, jdbcType=INTEGER},-->
+    <!--			#{end, mode=IN, jdbcType=INTEGER},-->
+    <!--			#{count, mode=OUT, jdbcType=INTEGER},-->
+    <!--			#{emps, mode=OUT, jdbcType=CURSOR, javaType=ResultSet, ResultMap=BaseResultMap},-->
+    <!--		)}-->
+    <!--	</select>-->
+</mapper>
